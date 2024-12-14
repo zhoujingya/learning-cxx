@@ -21,11 +21,25 @@ public:
     }
 
     // TODO: 实现移动构造器
-    DynFibonacci(DynFibonacci &&) noexcept = delete;
+    DynFibonacci(DynFibonacci &&D) noexcept {
+        cache = D.cache;
+        cached = D.cached;
+        D.cache = nullptr;
+        D.cached = 0;
+    };
 
     // TODO: 实现移动赋值
     // NOTICE: ⚠ 注意移动到自身问题 ⚠
-    DynFibonacci &operator=(DynFibonacci &&) noexcept = delete;
+    DynFibonacci &operator=(DynFibonacci &&D) {
+        if (this != &D) {
+            delete [] cache;
+            cache = D.cache;
+            cached = D.cached;
+            D.cache = nullptr;
+            D.cached = 0;
+        }
+        return *this;
+    };
 
     // TODO: 实现析构器，释放缓存空间
     ~DynFibonacci() {
@@ -34,9 +48,12 @@ public:
 
     // TODO: 实现正确的缓存优化斐波那契计算
     size_t operator[](int i) {
-        for (; false; ++cached) {
+        if(i < cached)
+            return cache[i];
+        for (; cached <= i; ++cached) {
             cache[cached] = cache[cached - 1] + cache[cached - 2];
         }
+        cached = i + 1;
         return cache[i];
     }
 
